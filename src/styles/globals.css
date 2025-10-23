@@ -2,6 +2,41 @@
 @tailwind utilities;
 @custom-variant dark (&:is(.dark *));
 
+@layer utilities {
+  /* 1. Define the keyframe animations */
+  @keyframes float-1 {
+    0%, 100% {
+      transform: translateY(0) translateX(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-220px) translateX(310px) rotate(50deg);
+    }
+  }
+
+  @keyframes float-2 {
+    0%, 100% {
+      transform: translateY(0) translateX(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(215px) translateX(-310px) rotate(-50deg);
+    }
+  }
+
+  /* 2. Create the animation utility classes */
+  .animate-float-1 {
+    animation: float-1 8s ease-in-out infinite alternate;
+  }
+
+  .animate-float-2 {
+    animation: float-2 10s ease-in-out infinite alternate;
+  }
+}
+/* In your global index.css */
+body {
+  scrollbar-gutter: stable;
+}
+
+
 :root {
   --font-size: 16px;
   --background: #ffffff;
@@ -78,6 +113,17 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 @theme inline {
