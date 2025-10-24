@@ -4,6 +4,7 @@ import { cn } from './lib/utils';
 
 // Document and DocumentType interfaces
 export interface Document {
+  createElement: any;
   id: string;
   name: string;
   uploadDate: string;
@@ -77,8 +78,6 @@ export function MainApp({
           selectedDocId={selectedDocId}
           onSelectDocument={onSelectDocument}
           onUploadClick={() => onUploadDialogOpenChange(true)}
-
-          // --- Corrected Prop Passing ---
           onDownloadDocument={onDownloadDocument}
           onDeleteDocument={onDeleteDocument}
         />

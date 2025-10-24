@@ -25,7 +25,7 @@ export function DocumentSidebar({
     <div className="w-85 border-r border-gray-200 dark:border-gray-800/50 bg-white/50 dark:bg-[#1a1f3a]/20 backdrop-blur-sm flex flex-col h-screen">
 
       {/* Update header border and text colors */}
-      <div className="flex items-center justify-between py-2 pl-4 pr-2 border-b h-16 border-gray-200 dark:border-gray-800/50">
+      <div className="flex items-center justify-between py-2 pl-4 pr-2 border-b h-[10vh] border-gray-200 dark:border-gray-800/50">
         <div className='pl-1'>
           <h2 className="text-black dark:text-white mt-1">Documents</h2>
           <p className="text-gray-600 dark:text-gray-400 text-xs">{documents.length} documents uploaded</p>
@@ -79,10 +79,10 @@ export function DocumentSidebar({
                     <div
                       // Update status badge colors
                       className={`inline-flex px-2 py-0.5 rounded text-xs ${doc.status === 'analyzed'
-                          ? 'bg-green-100/50 text-green-700 dark:bg-green-500/20 dark:text-green-400'
-                          : doc.status === 'processing'
-                            ? 'bg-yellow-100/50 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400'
-                            : 'bg-gray-100/50 text-gray-600 dark:bg-gray-500/20 dark:text-gray-400'
+                        ? 'bg-green-100/50 text-green-700 dark:bg-green-500/20 dark:text-green-400'
+                        : doc.status === 'processing'
+                          ? 'bg-yellow-100/50 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400'
+                          : 'bg-gray-100/50 text-gray-600 dark:bg-gray-500/20 dark:text-gray-400'
                         }`}
                     >
                       {doc.status === 'analyzed'
@@ -95,7 +95,7 @@ export function DocumentSidebar({
                 </div>
               </div>
               {/* Update hover icon colors */}
-              <button
+              <div
                 onClick={(e) => {
                   e.stopPropagation();
                   onDeleteDocument(doc.id);
@@ -104,8 +104,8 @@ export function DocumentSidebar({
                 aria-label="Delete document"
               >
                 <Trash2 className="w-4 h-4" />
-              </button>
-              <button
+              </div>
+              <div
                 onClick={(e) => {
                   e.stopPropagation();
                   onDownloadDocument(doc.id);
@@ -114,7 +114,7 @@ export function DocumentSidebar({
                 aria-label="Download document"
               >
                 <Download className="w-4 h-4" />
-              </button>
+              </div>
             </button>
           ))}
         </div>

@@ -63,32 +63,32 @@ export function DocumentView({ document }: DocumentViewProps) {
       className="flex-1 flex flex-col"
     >
       <Tabs defaultValue="overview" className="flex-1 flex flex-col">
-        <div className="border-b border-gray-200 dark:border-gray-800/50 bg-white/50 dark:bg-[#1a1f3a]/20 backdrop-blur-sm px-6 py-1">
+        <div className="h-[10vh] border-b border-gray-200 dark:border-gray-800/50 bg-white/50 dark:bg-[#1a1f3a]/20 backdrop-blur-sm px-6 py-1">
           <TabsList className="bg-transparent border-0 flex gap-4 h-14 py-2">
             <TabsTrigger
               value="overview"
-              className="data-[state=active]:bg-blue-100 dark:bg-transparent dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-blue-600/20 dark:data-[state=active]:to-purple-600/20 data-[state=active]:text-blue-700 dark:data-[state=active]:text-white text-gray-600 dark:text-gray-400"
+              className="data-[state=active]:bg-blue-100 mt-2 dark:bg-transparent dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-blue-600/20 dark:data-[state=active]:to-purple-600/20 data-[state=active]:text-blue-700 dark:data-[state=active]:text-white text-gray-600 dark:text-gray-400"
             >
               <TrendingUp className="w-4 h-4 mr-2" />
               Overview
             </TabsTrigger>
             <TabsTrigger
               value="risks"
-              className="data-[state=active]:bg-blue-100 dark:bg-transparent dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-blue-600/20 dark:data-[state=active]:to-purple-600/20 data-[state=active]:text-blue-700 dark:data-[state=active]:text-white text-gray-600 dark:text-gray-400"
+              className="data-[state=active]:bg-blue-100  mt-2 dark:bg-transparent dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-blue-600/20 dark:data-[state=active]:to-purple-600/20 data-[state=active]:text-blue-700 dark:data-[state=active]:text-white text-gray-600 dark:text-gray-400"
             >
               <AlertTriangle className="w-4 h-4 mr-2" />
               Risks
             </TabsTrigger>
             <TabsTrigger
               value="clauses"
-              className="data-[state=active]:bg-blue-100 dark:bg-transparent dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-blue-600/20 dark:data-[state=active]:to-purple-600/20 data-[state=active]:text-blue-700 dark:data-[state=active]:text-white text-gray-600 dark:text-gray-400"
+              className="data-[state=active]:bg-blue-100   mt-2 dark:bg-transparent dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-blue-600/20 dark:data-[state=active]:to-purple-600/20 data-[state=active]:text-blue-700 dark:data-[state=active]:text-white text-gray-600 dark:text-gray-400"
             >
               <FileCheck className="w-4 h-4 mr-2" />
               Clauses
             </TabsTrigger>
             <TabsTrigger
               value="chat"
-              className="data-[state=active]:bg-blue-100 dark:bg-transparent dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-blue-600/20 dark:data-[state=active]:to-purple-600/20 data-[state=active]:text-blue-700 dark:data-[state=active]:text-white text-gray-600 dark:text-gray-400"
+              className="data-[state=active]:bg-blue-100  mt-2 dark:bg-transparent dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-blue-600/20 dark:data-[state=active]:to-purple-600/20 data-[state=active]:text-blue-700 dark:data-[state=active]:text-white text-gray-600 dark:text-gray-400"
             >
               <MessageSquare className="w-4 h-4 mr-2" />
               Chat
@@ -101,7 +101,7 @@ export function DocumentView({ document }: DocumentViewProps) {
             <TabsContent value="overview" className="h-auto m-0 px-6" asChild>
               <motion.div key="overview" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit"
                 className="flex flex-row w-full h-full">
-                <ScrollArea className="h-[88vh] w-[70%] pr-4 [&_[data-orientation='vertical']]:hidden [&_[data-orientation='horizontal']]:hidden">
+                <ScrollArea className="h-[88vh] w-[70%] pr-4 pt-1 [&_[data-orientation='vertical']]:hidden [&_[data-orientation='horizontal']]:hidden">
                   <motion.div variants={containerVariants} initial="hidden" animate="visible">
                     <motion.p variants={itemVariants} className="text-gray-600 dark:text-gray-400 mb-3">Uploaded on {document.uploadDate}</motion.p>
 

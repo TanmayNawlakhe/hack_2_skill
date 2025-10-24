@@ -108,6 +108,14 @@ export default function App() {
     setUploadDialogOpen(false);
   };
 
+  const handleDeleteDocument = (id: string) => {
+    console.log("Deleting DOc....");
+  }
+
+  const handleDownloadDocument = (id: string) => {
+    console .log("Downloading doc");
+  }
+
   // --- Navigation Handlers for UserNav ---
   const handleGoToProfile = () => navigate('/profile');
   const handleGoToAdmin = () => navigate('/admin');
@@ -204,6 +212,8 @@ export default function App() {
                         onSelectFromModal={handleSelectFromModal}
                         onGoToProfile={handleGoToProfile}
                         onGoToAdmin={handleGoToAdmin}
+                        onDeleteDocument={handleDeleteDocument}
+                        onDownloadDocument={handleDownloadDocument}
                       />
                     </motion.div>
                   )}
