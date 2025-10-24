@@ -9,11 +9,21 @@ import {
   ChevronDown,
   Mic,
   Volume2,
-  Pause
+  Pause,
+  Cpu
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { ScrollArea } from './ui/scroll-area';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from './ui/dropdown-menu';
 
 interface Message {
   id: string;
@@ -26,6 +36,21 @@ interface Message {
 interface ChatInterfaceProps {
   documentName: string;
 }
+
+// Gemini model options
+type GeminiModel = {
+  id: string;
+  name: string;
+  description: string;
+};
+
+const GEMINI_MODELS: GeminiModel[] = [
+  { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', description: 'Most capable model' },
+  { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', description: 'Fast and efficient' },
+  { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', description: 'Advanced reasoning' },
+  { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', description: 'Balanced performance' },
+  { id: 'gemini-1.0-pro', name: 'Gemini 1.0 Pro', description: 'Reliable baseline' },
+];
 
 // (Animation variants remain the same)
 const messageVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
@@ -48,6 +73,7 @@ export function ChatInterface({ documentName }: ChatInterfaceProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
   const [isListening, setIsListening] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<string>('gemini-2.5-pro');
 
   const suggestions = [
     "What are the main risks in this contract?",
@@ -79,10 +105,11 @@ export function ChatInterface({ documentName }: ChatInterfaceProps) {
     setExpandedSourcesId(null);
     setTimeout(() => {
       const newAssistantId = (Date.now() + 1).toString();
+      const currentModel = GEMINI_MODELS.find(m => m.id === selectedModel);
       const assistantMessage: Message = {
         id: newAssistantId,
         role: 'assistant',
-        content: `Based on my analysis of ${documentName}, ${textToSend.toLowerCase().includes('risk')
+        content: `[Using ${currentModel?.name}] Based on my analysis of ${documentName}, ${textToSend.toLowerCase().includes('risk')
           ? 'the main risks include ambiguous termination clauses and limited liability caps. These could expose you to unexpected obligations.'
           : textToSend.toLowerCase().includes('termination')
             ? 'the termination clause allows either party to end the agreement with 30 days written notice. However, certain obligations survive termination, including confidentiality and payment terms.'
@@ -277,6 +304,52 @@ export function ChatInterface({ documentName }: ChatInterfaceProps) {
           )}
 
           <div className="flex gap-3">
+            {/* Model Selector Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="h-[60px] px-4 bg-white dark:bg-[#1a1f3a] border border-gray-300 dark:border-gray-700 text-black dark:text-white hover:border-blue-300 dark:hover:border-blue-500/30 flex items-center gap-2 min-w-[180px]"
+                >
+                  <Cpu className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                  <div className="flex flex-col items-start flex-1">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">Model</span>
+                    <span className="text-sm font-medium truncate max-w-[120px]">
+                      {GEMINI_MODELS.find(m => m.id === selectedModel)?.name}
+                    </span>
+                  </div>
+                  <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="start" 
+                className="w-[280px] bg-white dark:bg-[#1a1f3a] border-gray-300 dark:border-gray-700"
+              >
+                <DropdownMenuLabel className="text-gray-600 dark:text-gray-400">
+                  Select Gemini Model
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
+                <DropdownMenuRadioGroup value={selectedModel} onValueChange={setSelectedModel}>
+                  {GEMINI_MODELS.map((model) => (
+                    <DropdownMenuRadioItem 
+                      key={model.id} 
+                      value={model.id}
+                      className="cursor-pointer focus:bg-blue-50 dark:focus:bg-blue-500/10"
+                    >
+                      <div className="flex flex-col gap-1">
+                        <span className="font-medium text-black dark:text-white">
+                          {model.name}
+                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {model.description}
+                        </span>
+                      </div>
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {/* Update textarea styles */}
             <Textarea
               value={input}
