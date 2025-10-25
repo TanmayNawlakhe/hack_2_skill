@@ -1,4 +1,4 @@
-import { FileText, Clock, Trash2, Eye, Upload } from 'lucide-react';
+import { FileText, Clock, Trash2, Eye, Upload, Download } from 'lucide-react';
 import type { Document } from './MainApp';
 import { ScrollArea } from './ui/scroll-area';
 import { Button } from './ui/button';
@@ -9,6 +9,7 @@ interface DocumentSidebarProps {
   onSelectDocument: (id: string) => void;
   onDeleteDocument: (id: string) => void;
   onPreviewDocument: (id: string) => void;
+  onDownloadDocument: (id: string) => void;
   onUploadClick: () => void;
 }
 
@@ -18,6 +19,7 @@ export function DocumentSidebar({
   onSelectDocument,
   onDeleteDocument,
   onPreviewDocument,
+  onDownloadDocument,
   onUploadClick,
 }: DocumentSidebarProps) {
   return (
@@ -25,7 +27,7 @@ export function DocumentSidebar({
     <div className="w-85 border-r border-gray-200 dark:border-gray-800/50 bg-white/50 dark:bg-[#1a1f3a]/20 backdrop-blur-sm flex flex-col h-screen">
 
       {/* Update header border and text colors */}
-      <div className="flex items-center justify-between py-2 pl-4 pr-2 border-b h-16 border-gray-200 dark:border-gray-800/50">
+      <div className="flex items-center justify-between py-2 pl-4 pr-2 border-b h-[10vh] border-gray-200 dark:border-gray-800/50">
         <div className='pl-1'>
           <h2 className="text-black dark:text-white mt-1">Documents</h2>
           <p className="text-gray-600 dark:text-gray-400 text-xs">{documents.length} documents uploaded</p>
@@ -79,10 +81,10 @@ export function DocumentSidebar({
                     <div
                       // Update status badge colors
                       className={`inline-flex px-2 py-0.5 rounded text-xs ${doc.status === 'analyzed'
-                          ? 'bg-green-100/50 text-green-700 dark:bg-green-500/20 dark:text-green-400'
-                          : doc.status === 'processing'
-                            ? 'bg-yellow-100/50 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400'
-                            : 'bg-gray-100/50 text-gray-600 dark:bg-gray-500/20 dark:text-gray-400'
+                        ? 'bg-green-100/50 text-green-700 dark:bg-green-500/20 dark:text-green-400'
+                        : doc.status === 'processing'
+                          ? 'bg-yellow-100/50 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400'
+                          : 'bg-gray-100/50 text-gray-600 dark:bg-gray-500/20 dark:text-gray-400'
                         }`}
                     >
                       {doc.status === 'analyzed'
@@ -95,26 +97,41 @@ export function DocumentSidebar({
                 </div>
               </div>
               {/* Update hover icon colors */}
-              <button
+              {/* Delete button - top right */}
+              <div
                 onClick={(e) => {
                   e.stopPropagation();
                   onDeleteDocument(doc.id);
                 }}
-                className="absolute top-2 right-2 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-100/50 dark:hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-2 right-2 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-100/50 dark:hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                 aria-label="Delete document"
               >
                 <Trash2 className="w-4 h-4" />
-              </button>
-              <button
+              </div>
+              
+              {/* Preview button - bottom left */}
+              <div
                 onClick={(e) => {
                   e.stopPropagation();
                   onPreviewDocument(doc.id);
                 }}
-                className="absolute bottom-2 right-2 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-100/50 dark:hover:bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute bottom-2 left-2 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-100/50 dark:hover:bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                 aria-label="Preview document"
               >
                 <Eye className="w-4 h-4" />
-              </button>
+              </div>
+              
+              {/* Download button - bottom right */}
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDownloadDocument(doc.id);
+                }}
+                className="absolute bottom-2 right-2 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-green-500 dark:hover:text-green-400 hover:bg-green-100/50 dark:hover:bg-green-500/10 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                aria-label="Download document"
+              >
+                <Download className="w-4 h-4" />
+              </div>
             </button>
           ))}
         </div>

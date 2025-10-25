@@ -121,13 +121,32 @@ export default function App() {
   const handleGoToAdmin = () => navigate('/admin');
 
   // --- Document Action Handlers ---
+  // Delete document and clean up
   const handleDeleteDocument = (id: string) => {
+    const doc = documents.find(d => d.id === id);
+    if (doc?.fileUrl) {
+      URL.revokeObjectURL(doc.fileUrl); // Free memory from blob URL
+    }
     setDocuments(prev => prev.filter(doc => doc.id !== id));
     if (selectedDocId === id) {
       setSelectedDocId(null);
     }
+    console.log("Deleting document:", id);
   };
 
+  // Download document
+  const handleDownloadDocument = (id: string) => {
+    const doc = documents.find(d => d.id === id);
+    if (doc?.fileUrl) {
+      const link = document.createElement('a');
+      link.href = doc.fileUrl;
+      link.download = doc.name;
+      link.click();
+    }
+    console.log("Downloading document:", id);
+  };
+
+  // Preview document in modal
   const handlePreviewDocument = (id: string) => {
     setPreviewDocId(id);
     setPreviewModalOpen(true);
@@ -237,6 +256,7 @@ export default function App() {
                         onGoToAdmin={handleGoToAdmin}
                         onDeleteDocument={handleDeleteDocument}
                         onPreviewDocument={handlePreviewDocument}
+                        onDownloadDocument={handleDownloadDocument}
                       />
                     </motion.div>
                   )}

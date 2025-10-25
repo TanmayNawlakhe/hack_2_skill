@@ -59,6 +59,8 @@ const suggestionItemVariants = { hidden: { opacity: 0, y: 15 }, visible: { opaci
 const sourcesVariants = { hidden: { opacity: 0, height: 0, marginTop: 0 }, visible: { opacity: 1, height: 'auto', marginTop: '12px' } };
 
 export function ChatInterface({ documentName }: ChatInterfaceProps) {
+
+  const [isModelMenuOpen, setIsModelMenuOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -180,8 +182,8 @@ export function ChatInterface({ documentName }: ChatInterfaceProps) {
                 <div
                   // Update message bubble styles
                   className={`max-w-[80%] rounded-xl p-4 flex flex-col ${message.role === 'user'
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                      : 'bg-gray-100 dark:bg-[#1a1f3a]/50 border border-gray-200 dark:border-gray-800/50 text-black dark:text-gray-200'
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                    : 'bg-gray-100 dark:bg-[#1a1f3a]/50 border border-gray-200 dark:border-gray-800/50 text-black dark:text-gray-200'
                     }`}
                 >
                   <p className="text-sm leading-relaxed">{message.content}</p>
@@ -278,7 +280,7 @@ export function ChatInterface({ documentName }: ChatInterfaceProps) {
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                <span className="text-gray-600 dark:text-gray-400 text-sm">Suggested questions:</span>
+                <span className="text-gray-900 dark:text-gray-400 text-sm">Suggested questions:</span>
               </div>
               <motion.div
                 className="grid grid-cols-2 gap-2"
@@ -294,7 +296,7 @@ export function ChatInterface({ documentName }: ChatInterfaceProps) {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleSuggestionClick(suggestion)}
                     // Update suggestion button styles
-                    className="text-left p-3 rounded-lg bg-gray-50 dark:bg-[#1a1f3a]/50 border border-gray-200 dark:border-gray-800/50 hover:border-blue-300 dark:hover:border-blue-500/30 hover:bg-gray-100 dark:hover:bg-[#1a1f3a] text-gray-700 dark:text-gray-300 text-sm transition-all"
+                    className="text-left p-3 rounded-lg bg-gray-50 dark:bg-[#1a1f3a]/50 border border-gray-200 dark:border-gray-800/50 hover:border-blue-300 dark:hover:border-blue-500/30 hover:bg-gray-100 dark:hover:bg-[#1a1f3a] text-gray-900 dark:text-gray-300 text-sm transition-all"
                   >
                     {suggestion}
                   </motion.button>
@@ -305,25 +307,31 @@ export function ChatInterface({ documentName }: ChatInterfaceProps) {
 
           <div className="flex gap-3">
             {/* Model Selector Dropdown */}
-            <DropdownMenu>
+            <DropdownMenu open={isModelMenuOpen} onOpenChange={setIsModelMenuOpen}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="h-[60px] px-4 bg-white dark:bg-[#1a1f3a] border border-gray-300 dark:border-gray-700 text-black dark:text-white hover:border-blue-300 dark:hover:border-blue-500/30 flex items-center gap-2 min-w-[180px]"
+                  className="h-[60px] px-4 bg-white dark:bg-[#1a1f3a] border border-gray-300 dark:border-gray-700 text-black dark:text-white hover:border-blue-300 dark:hover:border-blue-500/30 flex items-center gap-2 min-w-[180px] dark:hover:bg-[#1a1f3a]/50"
                 >
                   <Cpu className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                   <div className="flex flex-col items-start flex-1">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Model</span>
-                    <span className="text-sm font-medium truncate max-w-[120px]">
+                    <span className="text-xs text-gray-800 dark:text-gray-400">Model</span>
+                    <span className="text-sm truncate max-w-[120px]">
                       {GEMINI_MODELS.find(m => m.id === selectedModel)?.name}
                     </span>
                   </div>
-                  <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+
+                  {/* ✅ Add rotation transition here */}
+                  <ChevronDown
+                    className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform duration-200 ${isModelMenuOpen ? 'rotate-180' : ''
+                      }`}
+                  />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="start" 
-                className="w-[280px] bg-white dark:bg-[#1a1f3a] border-gray-300 dark:border-gray-700"
+
+              <DropdownMenuContent
+                align="start"
+                className="w-[280px] bg-white dark:backdrop-blur-3xl dark:bg-transparent border-gray-300 dark:border-gray-700"
               >
                 <DropdownMenuLabel className="text-gray-600 dark:text-gray-400">
                   Select Gemini Model
@@ -331,8 +339,8 @@ export function ChatInterface({ documentName }: ChatInterfaceProps) {
                 <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
                 <DropdownMenuRadioGroup value={selectedModel} onValueChange={setSelectedModel}>
                   {GEMINI_MODELS.map((model) => (
-                    <DropdownMenuRadioItem 
-                      key={model.id} 
+                    <DropdownMenuRadioItem
+                      key={model.id}
                       value={model.id}
                       className="cursor-pointer focus:bg-blue-50 dark:focus:bg-blue-500/10"
                     >
@@ -349,6 +357,7 @@ export function ChatInterface({ documentName }: ChatInterfaceProps) {
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
+
 
             {/* Update textarea styles */}
             <Textarea
