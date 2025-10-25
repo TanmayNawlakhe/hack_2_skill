@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { CheckCircle, Globe, Languages, Scale, Shield, Lock, Sparkles } from 'lucide-react';
+import { CheckCircle, Globe, Languages, Scale, Lock, Sparkles } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { motion } from 'framer-motion';
 import { cn } from './lib/utils';

@@ -1,3 +1,4 @@
+import { cubicBezier } from 'framer-motion';
 import { useState, type JSX, useEffect } from 'react';
 import { LoginPage } from './components/LoginPage';
 import { SignupPage } from './components/SignupPage';
@@ -37,7 +38,7 @@ function GuestRoute({ isAuth, children }: { isAuth: boolean; children: JSX.Eleme
 // Animation transition settings
 const appTransition = {
   duration: 0.6,
-  ease: [0.32, 0.72, 0, 1] // A nice "deceleration" curve
+  ease: cubicBezier(0.32, 0.72, 0, 1) // A nice "deceleration" curve
 };
 
 // Main App component

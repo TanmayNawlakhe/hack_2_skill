@@ -45,6 +45,7 @@ interface MainAppProps {
   // Added/Ensured these props are in the interface
   onDeleteDocument: (id: string) => void;
   onPreviewDocument: (id: string) => void;
+  onDownloadDocument: (id: string) => void;
 }
 
 export function MainApp({

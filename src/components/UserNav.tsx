@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-import { User, LogOut, Settings, Languages, Shield, Sun, Moon } from "lucide-react"; // 1. Import Sun and Moon
+import { User, LogOut, Settings, Languages, Sun, Moon } from "lucide-react"; // 1. Import Sun and Moon
 
 interface UserNavProps {
   onLogout: () => void;

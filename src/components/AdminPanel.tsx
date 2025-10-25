@@ -1,6 +1,6 @@
 import React from 'react'; // Added React import
 import {
-  ArrowLeft, Shield, Users, FileText, Zap, Database, BarChart2, CheckCircle, AlertTriangle, Clock, UserCheck,
+  ArrowLeft, Users, FileText, Zap, Database, CheckCircle, AlertTriangle, UserCheck,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';

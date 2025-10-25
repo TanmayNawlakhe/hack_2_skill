@@ -17,11 +17,6 @@ interface DocumentExtrasSidebarProps {
     document: Document;
 }
 
-// (Mock data remains unchanged)
-const mockVersions = (doc: Document) => [
-    { id: doc.id, name: doc.name, uploadDate: doc.uploadDate, url: '#' },
-    { id: 'v2', name: 'Draft v1.1.pdf', uploadDate: '2024-03-09', url: '#' },
-];
 const mockContacts = [
     { id: 'c1', type: 'person', name: 'Jane Doe', icon: User },
     { id: 'c2', type: 'email', name: 'jane.doe@techcorp.com', icon: Mail },
