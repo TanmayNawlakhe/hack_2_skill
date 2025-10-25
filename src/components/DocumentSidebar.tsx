@@ -1,4 +1,4 @@
-import { FileText, Clock, Trash2, Download, Upload } from 'lucide-react';
+import { FileText, Clock, Trash2, Eye, Upload } from 'lucide-react';
 import type { Document } from './MainApp';
 import { ScrollArea } from './ui/scroll-area';
 import { Button } from './ui/button';
@@ -8,7 +8,7 @@ interface DocumentSidebarProps {
   selectedDocId: string | null;
   onSelectDocument: (id: string) => void;
   onDeleteDocument: (id: string) => void;
-  onDownloadDocument: (id: string) => void;
+  onPreviewDocument: (id: string) => void;
   onUploadClick: () => void;
 }
 
@@ -17,7 +17,7 @@ export function DocumentSidebar({
   selectedDocId,
   onSelectDocument,
   onDeleteDocument,
-  onDownloadDocument,
+  onPreviewDocument,
   onUploadClick,
 }: DocumentSidebarProps) {
   return (
@@ -94,26 +94,29 @@ export function DocumentSidebar({
                   </div>
                 </div>
               </div>
-              {/* Update hover icon colors */}
+              {/* Hover action buttons */}
+              {/* Delete button - top right */}
               <div
                 onClick={(e) => {
                   e.stopPropagation();
                   onDeleteDocument(doc.id);
                 }}
-                className="absolute top-2 right-2 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-100/50 dark:hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-2 right-2 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-100/50 dark:hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                 aria-label="Delete document"
               >
                 <Trash2 className="w-4 h-4" />
               </div>
+              
+              {/* Preview button - bottom right */}
               <div
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDownloadDocument(doc.id);
+                  onPreviewDocument(doc.id);
                 }}
-                className="absolute bottom-2 right-2 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-100/50 dark:hover:bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                aria-label="Download document"
+                className="absolute bottom-2 right-2 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-100/50 dark:hover:bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                aria-label="Preview document"
               >
-                <Download className="w-4 h-4" />
+                <Eye className="w-4 h-4" />
               </div>
             </button>
           ))}
