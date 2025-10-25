@@ -8,6 +8,7 @@ export interface Document {
   name: string;
   uploadDate: string;
   status: 'analyzed' | 'processing' | 'pending';
+  fileUrl?: string; // Optional: URL or blob URL for document preview
   // ... (rest of interface)
   evals: {
     riskScore: number;
@@ -43,7 +44,7 @@ interface MainAppProps {
 
   // Added/Ensured these props are in the interface
   onDeleteDocument: (id: string) => void;
-  onDownloadDocument: (id: string) => void;
+  onPreviewDocument: (id: string) => void;
 }
 
 export function MainApp({
@@ -53,7 +54,7 @@ export function MainApp({
   onUploadDialogOpenChange,
   // Added props to destructuring
   onDeleteDocument,
-  onDownloadDocument,
+  onPreviewDocument,
 }: MainAppProps) {
 
   const selectedDocument = documents.find(doc => doc.id === selectedDocId);
@@ -79,7 +80,7 @@ export function MainApp({
           onUploadClick={() => onUploadDialogOpenChange(true)}
 
           // --- Corrected Prop Passing ---
-          onDownloadDocument={onDownloadDocument}
+          onPreviewDocument={onPreviewDocument}
           onDeleteDocument={onDeleteDocument}
         />
         <DocumentView document={selectedDocument} />

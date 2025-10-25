@@ -4,6 +4,7 @@ import { SignupPage } from './components/SignupPage';
 import { MainApp, type Document, type DocumentType } from './components/MainApp';
 import { ProfilePage } from './components/ProfilePage';
 import { AdminPanel } from './components/AdminPanel';
+import { DocumentPreviewModal } from './components/DocumentPreviewModal';
 // 1. --- IMPORT LANDING PAGE ---
 // (Adjust path if needed)
 import Index from './components/Landing'; 
@@ -57,6 +58,8 @@ export default function App() {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
+  const [previewDocId, setPreviewDocId] = useState<string | null>(null);
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -84,11 +87,16 @@ export default function App() {
   // --- Document Handling ---
   const handleUploadDocument = (file: File, documentType: DocumentType) => {
     console.log(`Uploading ${file.name} of type ${documentType}`);
+    
+    // Create a blob URL for the uploaded file so it can be previewed
+    const fileUrl = URL.createObjectURL(file);
+    
     const newDoc: Document = {
       id: Date.now().toString(),
       name: file.name,
       uploadDate: new Date().toISOString().split('T')[0],
       status: 'analyzed',
+      fileUrl: fileUrl, // Store the blob URL for preview
       evals: {
         riskScore: Math.floor(Math.random() * 100),
         complexity: ['Low', 'Medium', 'High'][Math.floor(Math.random() * 3)],
@@ -112,9 +120,32 @@ export default function App() {
   const handleGoToProfile = () => navigate('/profile');
   const handleGoToAdmin = () => navigate('/admin');
 
+  // --- Document Action Handlers ---
+  const handleDeleteDocument = (id: string) => {
+    setDocuments(prev => prev.filter(doc => doc.id !== id));
+    if (selectedDocId === id) {
+      setSelectedDocId(null);
+    }
+  };
+
+  const handlePreviewDocument = (id: string) => {
+    setPreviewDocId(id);
+    setPreviewModalOpen(true);
+  };
+
   // --- Render Routes ---
+  const previewDocument = documents.find(doc => doc.id === previewDocId);
+
   return (
-    <Routes>
+    <>
+      {/* Document Preview Modal - Rendered at top level */}
+      <DocumentPreviewModal
+        document={previewDocument || null}
+        open={previewModalOpen}
+        onOpenChange={setPreviewModalOpen}
+      />
+
+      <Routes>
       {/* 3. --- UPDATED PUBLIC ROUTES --- */}
       {/* These routes are for unauthenticated users. Logged-in users will be redirected to /app. */}
       <Route
@@ -204,6 +235,8 @@ export default function App() {
                         onSelectFromModal={handleSelectFromModal}
                         onGoToProfile={handleGoToProfile}
                         onGoToAdmin={handleGoToAdmin}
+                        onDeleteDocument={handleDeleteDocument}
+                        onPreviewDocument={handlePreviewDocument}
                       />
                     </motion.div>
                   )}
@@ -239,5 +272,6 @@ export default function App() {
         element={<Navigate to={isAuthenticated ? '/app' : '/'} replace />}
       />
     </Routes>
+    </>
   );
 }
