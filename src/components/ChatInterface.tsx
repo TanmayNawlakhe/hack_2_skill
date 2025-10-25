@@ -24,17 +24,15 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from './ui/dropdown-menu';
+import type { Message } from './MainApp'; // Import from MainApp
 
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: string;
-  sources?: string[];
-}
+// --- REMOVED Message Interface ---
 
 interface ChatInterfaceProps {
-  documentName: string;
+  documentId: string;
+  chatHistory: Message[];
+  onSendMessage: (documentId: string, messageText: string) => Promise<void>;
+  documentName: string; 
 }
 
 // Gemini model options
@@ -58,17 +56,29 @@ const suggestionsContainerVariants = { visible: { transition: { staggerChildren:
 const suggestionItemVariants = { hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0 } };
 const sourcesVariants = { hidden: { opacity: 0, height: 0, marginTop: 0 }, visible: { opacity: 1, height: 'auto', marginTop: '12px' } };
 
-export function ChatInterface({ documentName }: ChatInterfaceProps) {
+export function ChatInterface({
+  documentId,
+  documentName,
+  chatHistory,
+  onSendMessage
+  // -----------------
+}: ChatInterfaceProps) {
 
   const [isModelMenuOpen, setIsModelMenuOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      role: 'assistant',
-      content: `Hello! I've analyzed ${documentName}. I can help you understand the risks, clauses, and legal implications. What would you like to know?`,
-      timestamp: new Date().toISOString()
-    }
-  ]);
+    
+  // --- CREATE INITIAL MESSAGE ---
+  // This message is static and doesn't live in the document state
+  const initialMessage: Message = {
+    id: 'initial-1',
+    role: 'assistant',
+    content: `Hello! I've analyzed ${documentName}. I can help you understand the risks, clauses, and legal implications. What would you like to know?`,
+    timestamp: new Date().toISOString()
+  };
+
+  // --- COMBINE for rendering ---
+  const messages = [initialMessage, ...chatHistory];
+  // -----------------------------
+
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [expandedSourcesId, setExpandedSourcesId] = useState<string | null>(null);
@@ -88,47 +98,26 @@ export function ChatInterface({ documentName }: ChatInterfaceProps) {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [chatHistory]); // <-- Depend on chatHistory prop
 
+  // --- REWRITTEN handleSendMessage ---
   const handleSendMessage = async (messageText?: string) => {
     setIsListening(false);
     setSpeakingMessageId(null);
     const textToSend = messageText || input;
     if (!textToSend.trim()) return;
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: textToSend,
-      timestamp: new Date().toISOString()
-    };
-    setMessages(prev => [...prev, userMessage]);
+    
     setInput('');
     setIsLoading(true);
     setExpandedSourcesId(null);
-    setTimeout(() => {
-      const newAssistantId = (Date.now() + 1).toString();
-      const currentModel = GEMINI_MODELS.find(m => m.id === selectedModel);
-      const assistantMessage: Message = {
-        id: newAssistantId,
-        role: 'assistant',
-        content: `[Using ${currentModel?.name}] Based on my analysis of ${documentName}, ${textToSend.toLowerCase().includes('risk')
-          ? 'the main risks include ambiguous termination clauses and limited liability caps. These could expose you to unexpected obligations.'
-          : textToSend.toLowerCase().includes('termination')
-            ? 'the termination clause allows either party to end the agreement with 30 days written notice. However, certain obligations survive termination, including confidentiality and payment terms.'
-            : textToSend.toLowerCase().includes('unusual')
-              ? 'I noticed an auto-renewal clause that may be uncommon. The contract automatically renews unless you provide notice 60 days before expiration.'
-              : 'I found several important provisions that require careful review. Would you like me to explain any specific section in detail?'}`,
-        timestamp: new Date().toISOString(),
-        sources: [
-          `Section 4.1 of ${documentName}`,
-          `Appendix B, Page 12`,
-          `Legal Precedent: Case #12-345`
-        ]
-      };
-      setMessages(prev => [...prev, assistantMessage]);
-      setIsLoading(false);
-    }, 1000);
+    
+    // Call the prop passed from the parent
+    // We pass the documentId so the parent knows which document to update
+    await onSendMessage(documentId, textToSend); 
+    
+    setIsLoading(false);
   };
+  // ------------------------------------
 
   const handleSuggestionClick = (suggestion: string) => {
     handleSendMessage(suggestion);
@@ -165,6 +154,7 @@ export function ChatInterface({ documentName }: ChatInterfaceProps) {
       <ScrollArea className="py-4 px-6 flex-1 min-h-0 [&_[data-orientation='vertical']]:hidden" ref={scrollRef}>
         <div className="max-w-3xl mx-auto space-y-6">
           <AnimatePresence>
+            {/* --- Render the combined array --- */}
             {messages.map((message) => (
               <motion.div
                 key={message.id}
@@ -276,7 +266,8 @@ export function ChatInterface({ documentName }: ChatInterfaceProps) {
       {/* Update input bar background/border */}
       <div className="border-t border-gray-200 dark:border-gray-800/80 bg-white/80 dark:bg-[#1a1f3a]/30 p-4 backdrop-blur-sm">
         <div className="max-w-3xl mx-auto">
-          {messages.length <= 1 && (
+          {/* --- Update suggestion logic --- */}
+          {chatHistory.length === 0 && ( // <-- Check prop length
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />

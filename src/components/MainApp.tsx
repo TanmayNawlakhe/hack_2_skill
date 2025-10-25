@@ -2,6 +2,17 @@ import { DocumentSidebar } from './DocumentSidebar';
 import { DocumentView } from './DocumentView';
 import { cn } from './lib/utils';
 
+// --- ADDED / MOVED ---
+// (Moved from ChatInterface.tsx)
+export interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+  sources?: string[];
+}
+// --------------------
+
 // Document and DocumentType interfaces
 export interface Document {
   id: string;
@@ -27,6 +38,10 @@ export interface Document {
     content: string;
     type: string;
   }>;
+  
+  // store the chat history for this specific document
+  chatHistory?: Message[];
+  // -----------
 }
 export type DocumentType = 'scanned' | 'electronic';
 
@@ -46,6 +61,12 @@ interface MainAppProps {
   onDeleteDocument: (id: string) => void;
   onPreviewDocument: (id: string) => void;
   onDownloadDocument: (id: string) => void;
+
+  // --- ADDED ---
+  // This function will be passed from the parent component
+  // It handles sending a message and getting a reply.
+  onSendMessage: (documentId: string, messageText: string) => Promise<void>;
+  // -----------
 }
 
 export function MainApp({
@@ -56,6 +77,9 @@ export function MainApp({
   // Added props to destructuring
   onDeleteDocument,
   onPreviewDocument,
+  // --- ADDED ---
+  onSendMessage,
+  // -----------
 }: MainAppProps) {
 
   const selectedDocument = documents.find(doc => doc.id === selectedDocId);
@@ -83,7 +107,12 @@ export function MainApp({
           onPreviewDocument={onPreviewDocument}
           onDeleteDocument={onDeleteDocument}
         />
-        <DocumentView document={selectedDocument} />
+        <DocumentView 
+          document={selectedDocument} 
+          // --- ADDED ---
+          onSendMessage={onSendMessage}
+          // -----------
+        />
       </div>
 
     </div>

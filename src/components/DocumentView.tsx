@@ -1,4 +1,4 @@
-import type { Document } from './MainApp';
+import type { Document, Message } from './MainApp'; // Import Message
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { ScrollArea } from './ui/scroll-area';
@@ -9,6 +9,9 @@ import { DocumentExtrasSidebar } from './DocumentExtrasSidebar';
 
 interface DocumentViewProps {
   document: Document | undefined;
+  // --- ADDED ---
+  onSendMessage: (documentId: string, messageText: string) => Promise<void>;
+  // -----------
 }
 
 const tabContentVariants = {
@@ -33,7 +36,7 @@ const itemVariants = {
 };
 
 
-export function DocumentView({ document }: DocumentViewProps) {
+export function DocumentView({ document, onSendMessage }: DocumentViewProps) {
   if (!document) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -214,7 +217,14 @@ export function DocumentView({ document }: DocumentViewProps) {
 
             <TabsContent value="chat" className="h-auto m-0" asChild>
               <motion.div key="chat" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit" className="h-full flex flex-row">
-                <ChatInterface documentName={document.name} />
+                {/* --- MODIFIED --- */}
+                <ChatInterface
+                  documentId={document.id}
+                  documentName={document.name}
+                  chatHistory={document.chatHistory || []} // Pass the history
+                  onSendMessage={onSendMessage} // Pass the handler
+                />
+                {/* ---------------- */}
                 <DocumentExtrasSidebar document={document} />
               </motion.div>
             </TabsContent>
