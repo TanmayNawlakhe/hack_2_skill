@@ -45,7 +45,6 @@ interface MainAppProps {
   // Added/Ensured these props are in the interface
   onDeleteDocument: (id: string) => void;
   onPreviewDocument: (id: string) => void;
-  onDownloadDocument: (id: string) => void;
 }
 
 export function MainApp({
@@ -56,7 +55,6 @@ export function MainApp({
   // Added props to destructuring
   onDeleteDocument,
   onPreviewDocument,
-  onDownloadDocument,
 }: MainAppProps) {
 
   const selectedDocument = documents.find(doc => doc.id === selectedDocId);
@@ -82,7 +80,6 @@ export function MainApp({
           onUploadClick={() => onUploadDialogOpenChange(true)}
           // --- Corrected Prop Passing ---
           onPreviewDocument={onPreviewDocument}
-          onDownloadDocument={onDownloadDocument}
           onDeleteDocument={onDeleteDocument}
         />
         <DocumentView document={selectedDocument} />

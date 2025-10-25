@@ -1,4 +1,4 @@
-import { FileText, Clock, Trash2, Eye, Upload, Download } from 'lucide-react';
+import { FileText, Clock, Trash2, Eye, Upload } from 'lucide-react';
 import type { Document } from './MainApp';
 import { ScrollArea } from './ui/scroll-area';
 import { Button } from './ui/button';
@@ -9,7 +9,6 @@ interface DocumentSidebarProps {
   onSelectDocument: (id: string) => void;
   onDeleteDocument: (id: string) => void;
   onPreviewDocument: (id: string) => void;
-  onDownloadDocument: (id: string) => void;
   onUploadClick: () => void;
 }
 
@@ -19,7 +18,6 @@ export function DocumentSidebar({
   onSelectDocument,
   onDeleteDocument,
   onPreviewDocument,
-  onDownloadDocument,
   onUploadClick,
 }: DocumentSidebarProps) {
   return (
@@ -96,7 +94,7 @@ export function DocumentSidebar({
                   </div>
                 </div>
               </div>
-              {/* Update hover icon colors */}
+              {/* Hover action buttons */}
               {/* Delete button - top right */}
               <div
                 onClick={(e) => {
@@ -109,28 +107,16 @@ export function DocumentSidebar({
                 <Trash2 className="w-4 h-4" />
               </div>
               
-              {/* Preview button - bottom left */}
+              {/* Preview button - bottom right */}
               <div
                 onClick={(e) => {
                   e.stopPropagation();
                   onPreviewDocument(doc.id);
                 }}
-                className="absolute bottom-2 left-2 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-100/50 dark:hover:bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                className="absolute bottom-2 right-2 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-100/50 dark:hover:bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                 aria-label="Preview document"
               >
                 <Eye className="w-4 h-4" />
-              </div>
-              
-              {/* Download button - bottom right */}
-              <div
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDownloadDocument(doc.id);
-                }}
-                className="absolute bottom-2 right-2 p-1 rounded text-gray-400 dark:text-gray-500 hover:text-green-500 dark:hover:text-green-400 hover:bg-green-100/50 dark:hover:bg-green-500/10 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                aria-label="Download document"
-              >
-                <Download className="w-4 h-4" />
               </div>
             </button>
           ))}
