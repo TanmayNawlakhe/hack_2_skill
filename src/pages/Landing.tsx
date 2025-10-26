@@ -1,5 +1,5 @@
-import { LegalHero } from "./LandingPageComps/LegalHero";
-import { LegalDisclaimer } from "./LandingPageComps/LegalDisclaimer";
+import { LegalHero } from "../components/LandingPageComps/LegalHero";
+import { LegalDisclaimer } from "../components/LandingPageComps/LegalDisclaimer";
 import {
     ArrowDown,
     Shield,

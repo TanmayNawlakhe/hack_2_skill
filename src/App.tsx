@@ -1,25 +1,17 @@
-import { cubicBezier } from 'framer-motion';
 import { useState, type JSX, useEffect } from 'react';
-import { LoginPage } from './components/LoginPage';
-import { SignupPage } from './components/SignupPage';
-// Notice fewer imports from MainApp
-import { MainApp, type Document, type DocumentType } from './components/MainApp';
-import { ProfilePage } from './components/ProfilePage';
-import { AdminPanel } from './components/AdminPanel';
+import { LoginPage } from './pages/LoginPage';
+import { SignupPage } from './pages/SignupPage';
+import { ProfilePage } from './pages/ProfilePage';
+import { AdminPanel } from './pages/AdminPanel';
 import { DocumentPreviewModal } from './components/DocumentPreviewModal';
-import Index from './components/Landing';
+import Index from './pages/Landing';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
-// We no longer import initialDocuments here
-import { UploadView } from './components/UploadView';
-import { motion, AnimatePresence } from 'framer-motion';
-import { UserNav } from './components/UserNav';
-
-// --- IMPORT YOUR NEW HOOK ---
+import { AppPage } from './pages/AppPage'; 
 import { useDocuments } from './hooks/useDocuments'; 
 
 type Theme = 'light' | 'dark';
 
-// Helper component for protected routes
+// Helper component for protected routes (Unchanged)
 function ProtectedRoute({ isAuth, children }: { isAuth: boolean; children: JSX.Element }) {
   if (!isAuth) {
     return <Navigate to="/login" replace />;
@@ -27,7 +19,7 @@ function ProtectedRoute({ isAuth, children }: { isAuth: boolean; children: JSX.E
   return children;
 }
 
-// This route is for "guests only" (unauthenticated users).
+// Guest route (Unchanged)
 function GuestRoute({ isAuth, children }: { isAuth: boolean; children: JSX.Element }) {
   if (isAuth) {
     return <Navigate to="/app" replace />;
@@ -35,87 +27,69 @@ function GuestRoute({ isAuth, children }: { isAuth: boolean; children: JSX.Eleme
   return children;
 }
 
-// Animation transition settings
-const appTransition = {
-  duration: 0.6,
-  ease: cubicBezier(0.32, 0.72, 0, 1) // A nice "deceleration" curve
-};
-
 // Main App component
 export default function App() {
-  // --- UI/Auth/Routing state STAYS here ---
+  // --- Auth, Theme, and Preview Modal state STAYS here ---
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [theme, setTheme] = useState<Theme>('dark');
-  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
-  const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   const [previewDocId, setPreviewDocId] = useState<string | null>(null);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  // --- ALL DOCUMENT LOGIC IS NOW IN THE HOOK ---
+  // --- uploadDialogOpen and selectedDocId state are REMOVED ---
+  // const [uploadDialogOpen, setUploadDialogOpen] = useState(false); // <-- REMOVED
+  // const [selectedDocId, setSelectedDocId] = useState<string | null>(null); // <-- REMOVED
+
+  // --- ALL DOCUMENT LOGIC IS NOW IN THE HOOK (Unchanged) ---
   const {
     documents,
-    isLoadingDocs, // You can use this for a loading spinner
+    isLoadingDocs, 
     handleUploadDocument,
     handleDeleteDocument,
     handleDownloadDocument,
-    handleSendMessage
+    handleSendMessage,
   } = useDocuments(isAuthenticated);
   // ---------------------------------------------
 
+  // Theme effect (Unchanged)
   useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
   }, [theme]);
 
+  // Theme handler (Unchanged)
   const handleToggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
-  // --- Auth Handlers STAYS here ---
+  // --- Auth Handlers are SIMPLIFIED ---
   const handleLogin = () => {
     setIsAuthenticated(true);
-    navigate('/app');
-    setUploadDialogOpen(true);
-    setSelectedDocId(null);
+    navigate('/app'); // Just navigate to /app. AppPage will show UploadView.
+    // setUploadDialogOpen(true); // <-- REMOVED
+    // setSelectedDocId(null); // <-- REMOVED
   };
 
   const handleSignup = () => {
     setIsAuthenticated(true);
-    navigate('/app');
-    setUploadDialogOpen(true);
-    setSelectedDocId(null);
+    navigate('/app'); // Just navigate to /app.
+    // setUploadDialogOpen(true); // <-- REMOVED
+    // setSelectedDocId(null); // <-- REMOVED
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    setSelectedDocId(null);
+    // setSelectedDocId(null); // <-- REMOVED
     navigate('/login');
   };
 
-  // --- Document handlers are now "wrappers" ---
-  // They call the hook logic AND manage UI state (modals/selection)
-
-  const handleUploadAndSelect = (file: File, documentType: DocumentType) => {
-    const newDoc = handleUploadDocument(file, documentType); // Call hook
-    setSelectedDocId(newDoc.id); // Manage UI state
-    setUploadDialogOpen(false); // Manage UI state
-  };
-
-  const handleDeleteAndDeselect = (id: string) => {
-    handleDeleteDocument(id); // Call hook
-    if (selectedDocId === id) { // Manage UI state
-      setSelectedDocId(null);
-    }
-  };
+  // --- Document handlers that managed UI state are REMOVED ---
+  // const handleUploadAndSelect = ... // <-- REMOVED (Logic moved to AppPage)
+  // const handleDeleteAndDeselect = ... // <-- REMOVED (Logic moved to AppPage)
+  // const handleSelectFromModal = ... // <-- REMOVED (Logic moved to AppPage)
 
   // --- UI-only handlers STAY here ---
-  const handleSelectFromModal = (id: string) => {
-    setSelectedDocId(id);
-    setUploadDialogOpen(false);
-  };
-
   const handleGoToProfile = () => navigate('/profile');
   const handleGoToAdmin = () => navigate('/admin');
 
@@ -127,14 +101,14 @@ export default function App() {
   // --- Render Routes ---
   const previewDocument = documents.find(doc => doc.id === previewDocId);
 
-  // If loading documents, you could show a full-page spinner
+  // Loading spinner logic (Unchanged)
   if (isLoadingDocs && isAuthenticated) {
-     return (
-       <div className="w-screen h-screen flex items-center justify-center bg-white dark:bg-black">
-         {/* Add a loading spinner component here */}
-         <p className="dark:text-white">Loading Documents...</p>
-       </div>
-     );
+    return (
+      <div className="w-screen h-screen flex items-center justify-center bg-white dark:bg-black">
+        {/* Add a loading spinner component here */}
+        <p className="dark:text-white">Loading Documents...</p>
+      </div>
+    );
   }
 
   return (
@@ -146,7 +120,7 @@ export default function App() {
       />
 
       <Routes>
-        {/* Public Routes */}
+        {/* Public Routes (Unchanged) */}
         <Route
           path="/"
           element={
@@ -178,76 +152,37 @@ export default function App() {
           }
         />
 
-        {/* Protected Routes Wrapper */}
+        {/* --- MODIFIED PROTECTED ROUTE --- */}
+        {/* This single route now handles both "/app" and "/app/:documentId" */}
         <Route
-          path="/app"
+          path="/app/:documentId?"
           element={
             <ProtectedRoute isAuth={isAuthenticated}>
-              <>
-                <UserNav
-                  onLogout={handleLogout}
-                  onGoToProfile={handleGoToProfile}
-                  onGoToAdmin={handleGoToAdmin}
-                  theme={theme}
-                  onToggleTheme={handleToggleTheme}
-                />
-                <div className="min-h-screen w-full flex items-center justify-center 
-                        bg-gray-100 dark:bg-gradient-to-br dark:from-black dark:via-black dark:to-indigo-950">
-
-                  <AnimatePresence mode="wait">
-                    {uploadDialogOpen ? (
-                      <motion.div
-                        key="upload-view"
-                        className="w-[70vw] max-w-[70vw] h-[80vh] shadow-2xl"
-                        layoutId="app-container"
-                        style={{ borderRadius: '1rem' }}
-                        transition={appTransition}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1.0 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                      >
-                        <UploadView
-                          documents={documents} // From hook
-                          onUpload={handleUploadAndSelect} // Wrapper fn
-                          onSelect={handleSelectFromModal}
-                        />
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="main-app"
-                        className="w-full h-screen"
-                        layoutId="app-container"
-                        style={{ borderRadius: '0rem' }}
-                        transition={appTransition}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                      >
-                        <MainApp
-                          onLogout={handleLogout}
-                          documents={documents} // From hook
-                          selectedDocId={selectedDocId}
-                          onSelectDocument={setSelectedDocId}
-                          onUploadDialogOpenChange={setUploadDialogOpen}
-                          onUpload={handleUploadAndSelect} // Wrapper fn
-                          onSelectFromModal={handleSelectFromModal}
-                          onGoToProfile={handleGoToProfile}
-                          onGoToAdmin={handleGoToAdmin}
-                          onDeleteDocument={handleDeleteAndDeselect} // Wrapper fn
-                          onPreviewDocument={handlePreviewDocument}
-                          onDownloadDocument={handleDownloadDocument} // From hook
-                          onSendMessage={handleSendMessage} // From hook
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </>
+              <AppPage
+                // Pass UserNav props
+                onLogout={handleLogout}
+                onGoToProfile={handleGoToProfile}
+                onGoToAdmin={handleGoToAdmin}
+                theme={theme}
+                onToggleTheme={handleToggleTheme}
+                
+                // Pass Document hook functions/data
+                documents={documents}
+                handleUploadDocument={handleUploadDocument}
+                handleDeleteDocument={handleDeleteDocument}
+                handleDownloadDocument={handleDownloadDocument}
+                handleSendMessage={handleSendMessage}
+                
+                // Pass Preview handler
+                onPreviewDocument={handlePreviewDocument}
+              />
             </ProtectedRoute>
           }
         />
+        {/* ---------------------------------- */}
 
-        {/* Other Protected Routes */}
+
+        {/* Other Protected Routes (Unchanged) */}
         <Route
           path="/profile"
           element={
@@ -265,7 +200,7 @@ export default function App() {
           }
         />
 
-        {/* Default Redirect */}
+        {/* Default Redirect (Unchanged) */}
         <Route
           path="*"
           element={<Navigate to={isAuthenticated ? '/app' : '/'} replace />}

@@ -4,11 +4,11 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Progress } from './ui/progress';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { cn } from './lib/utils';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Progress } from '../components/ui/progress';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { cn } from '../components/lib/utils';
 
 // (Animation variants remain unchanged)
 const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08 } } };

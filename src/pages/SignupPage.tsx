@@ -1,35 +1,40 @@
 import { useState } from 'react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Sparkles, Scale } from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { CheckCircle, Globe, Languages, Scale, Lock, Sparkles } from 'lucide-react';
+import { Badge } from '../components/ui/badge';
 import { motion } from 'framer-motion';
-import { Badge } from './ui/badge';
-import { cn } from './lib/utils';
+import { cn } from '../components/lib/utils';
 
-interface LoginPageProps {
-  onLogin: () => void;
-  onSwitchToSignup: () => void;
+interface SignupPageProps {
+  onSignup: () => void;
+  onSwitchToLogin: () => void;
 }
 
-export function LoginPage({ onLogin, onSwitchToSignup }: LoginPageProps) {
+export function SignupPage({ onSignup, onSwitchToLogin }: SignupPageProps) {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && password) {
-      onLogin();
-    } else {
-      console.error('Please enter your email and password.');
+    if (password !== confirmPassword) {
+      console.error('Passwords do not match');
+      return;
+    }
+    // Only proceed if passwords match and other fields are valid
+    if (name && email && password) {
+      onSignup();
     }
   };
 
-  const handleGoogleLogin = () => {
-    // Backend/Auth logic would be triggered here
-    console.log('Google login clicked');
-    // For now, you could also call onLogin() if you want it to proceed
-    onLogin(); 
+  const handleGoogleSignup = () => {
+    // Backend/Auth logic for Google Sign-Up would be triggered here
+    console.log('Google sign-up clicked');
+    // For now, you could also call onSignup() if you want it to proceed
+    onSignup();
   };
 
   return (
@@ -68,9 +73,24 @@ export function LoginPage({ onLogin, onSwitchToSignup }: LoginPageProps) {
           </Badge>
         </motion.div>
 
-        {/* Login Card */}
+        {/* Signup Card */}
         <div className="bg-white/80 dark:bg-[#1a1f3a]/50 backdrop-blur-xl border border-gray-200 dark:border-gray-800/50 rounded-2xl p-8 shadow-2xl">
+          <h2 className="text-black dark:text-white text-xl mb-6 text-center">Create Your Account</h2>
+
           <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-gray-700 dark:text-gray-300">Full Name</Label>
+              <Input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="John Doe"
+                className="bg-white dark:bg-[#0f1629] border-gray-300 dark:border-gray-700 text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">Email</Label>
               <Input
@@ -97,14 +117,31 @@ export function LoginPage({ onLogin, onSwitchToSignup }: LoginPageProps) {
               />
             </div>
 
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                <input type="checkbox" className="rounded border-gray-400 dark:border-gray-700" />
-                Remember me
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="text-gray-700 dark:text-gray-300">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                className="bg-white dark:bg-[#0f1629] border-gray-300 dark:border-gray-700 text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <div className="flex items-start gap-2 text-sm">
+              <input type="checkbox" className="mt-1 rounded border-gray-400 dark:border-gray-700" required />
+              <label className="text-gray-600 dark:text-gray-400">
+                I agree to the{' '}
+                <a href="#" className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">
+                  Terms of Service
+                </a>{' '}
+                and{' '}
+                <a href="#" className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">
+                  Privacy Policy
+                </a>
               </label>
-              <a href="#" className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">
-                Forgot password?
-              </a>
             </div>
 
             <Button
@@ -112,7 +149,7 @@ export function LoginPage({ onLogin, onSwitchToSignup }: LoginPageProps) {
               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white h-11"
             >
               <Sparkles className="w-4 h-4 mr-2" />
-              Sign In
+              Create Account
             </Button>
           </form>
 
@@ -123,10 +160,10 @@ export function LoginPage({ onLogin, onSwitchToSignup }: LoginPageProps) {
             <div className="flex-1 h-px bg-gray-300 dark:bg-gray-700"></div>
           </div>
 
-          {/* --- Google Sign-In Button --- */}
+          {/* --- Google Sign-Up Button --- */}
           <Button
             type="button"
-            onClick={handleGoogleLogin}
+            onClick={handleGoogleSignup}
             className="w-full bg-white dark:bg-transparent border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-center h-11 transition-all duration-300"
           >
             <svg className="w-4 h-4 mr-2" viewBox="0 0 48 48">
@@ -135,23 +172,23 @@ export function LoginPage({ onLogin, onSwitchToSignup }: LoginPageProps) {
               <path fill="#4CAF50" d="m24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.108-11.283-7.404l-6.571 4.819C9.656 39.663 16.318 44 24 44z"></path>
               <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C39.756 34.631 44 27.925 44 20c0-1.341-.138-2.65-.389-3.917z"></path>
             </svg>
-            Sign In with Google
+            Sign Up with Google
           </Button>
 
           <div className="mt-6 text-center">
             <p className="text-gray-600 dark:text-gray-400 text-sm">
-              Don't have an account?{' '}
+              Already have an account?{' '}
               <button
-                onClick={onSwitchToSignup}
+                onClick={onSwitchToLogin}
                 className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
               >
-                Sign up
+                Sign in
               </button>
             </p>
           </div>
         </div>
 
-        {/* Features
+        {/* Features */}
         <motion.div
           className="flex items-center justify-center gap-4 mt-12 text-gray-600 dark:text-gray-400 text-sm flex-wrap"
           initial={{ opacity: 0 }}
@@ -174,7 +211,7 @@ export function LoginPage({ onLogin, onSwitchToSignup }: LoginPageProps) {
             <Languages className="w-4 h-4 text-yellow-500 dark:text-amber-400" />
             <span>Multi-Lingual Support</span>
           </div>
-        </motion.div> */}
+        </motion.div>
       </div>
     </div>
   );
