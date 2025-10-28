@@ -7,7 +7,8 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-import { User, LogOut, Settings, Languages, Sun, Moon } from "lucide-react"; // 1. Import Sun and Moon
+import { User as UserIcon, LogOut, Settings, Languages, Sun, Moon } from "lucide-react"; // 1. Import Sun and Moon
+import { useAuth } from '../contexts/AuthContext';
 
 interface UserNavProps {
   onLogout: () => void;
@@ -25,6 +26,19 @@ export function UserNav({
   theme,
   onToggleTheme
 }: UserNavProps) { // 3. Destructure theme props
+  const { user } = useAuth();
+
+  const displayName = user?.name || 'Guest User';
+  const displayEmail = user?.email || '';
+  const avatarSrc = user?.picture || '';
+
+  const initials = displayName
+    .split(' ')
+    .map(n => n[0])
+    .slice(0,2)
+    .join('')
+    .toUpperCase();
+
   return (
     // 4. Make the root a flex container
     <div className="fixed top-4 right-4 z-[60] flex pr-8 items-center gap-2" data-user-nav-root>
@@ -54,7 +68,7 @@ export function UserNav({
                       dark:bg-gray-800/50 dark:text-white dark:hover:bg-gray-700/50 dark:border-gray-700/50
                       backdrop-blur-sm hover:border-blue-600 dark:hover:border-blue-600"
           >
-            <User className="h-5 w-5" />
+            <UserIcon className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
@@ -64,11 +78,19 @@ export function UserNav({
           forceMount
         >
           <DropdownMenuLabel className="font-normal">
-            <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">John Doe</p>
-              <p className="text-xs leading-none text-gray-500 dark:text-gray-400">
-                john.doe@example.com
-              </p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700/30 flex items-center justify-center">
+                {avatarSrc ? (
+                  // eslint-disable-next-line jsx-a11y/img-redundant-alt
+                  <img src={avatarSrc} alt="user avatar" className="w-10 h-10 object-cover" />
+                ) : (
+                  <span className="text-sm font-medium text-gray-800 dark:text-white">{initials}</span>
+                )}
+              </div>
+              <div className="flex flex-col">
+                <p className="text-sm font-medium leading-none">{displayName}</p>
+                <p className="text-xs leading-none text-gray-500 dark:text-gray-400">{displayEmail}</p>
+              </div>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator className="bg-gray-300 dark:bg-gray-700" />

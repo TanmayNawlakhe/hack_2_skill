@@ -7,7 +7,8 @@ import { DocumentPreviewModal } from './components/DocumentPreviewModal';
 import Index from './pages/Landing';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { AppPage } from './pages/AppPage'; 
-import { useDocuments } from './hooks/useDocuments'; 
+import { useDocuments } from './hooks/useDocuments';
+import { useAuth } from './contexts/AuthContext';
 
 type Theme = 'light' | 'dark';
 
@@ -29,12 +30,14 @@ function GuestRoute({ isAuth, children }: { isAuth: boolean; children: JSX.Eleme
 
 // Main App component
 export default function App() {
-  // --- Auth, Theme, and Preview Modal state STAYS here ---
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // --- Use Auth Context instead of local state ---
+  const { isAuthenticated, logout: authLogout, isLoading } = useAuth();
+  const navigate = useNavigate();
+  
+  // --- Theme and Preview Modal state STAYS here ---
   const [theme, setTheme] = useState<Theme>('dark');
   const [previewDocId, setPreviewDocId] = useState<string | null>(null);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
-  const navigate = useNavigate();
 
   // --- uploadDialogOpen and selectedDocId state are REMOVED ---
   // const [uploadDialogOpen, setUploadDialogOpen] = useState(false); // <-- REMOVED
@@ -63,24 +66,19 @@ export default function App() {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
-  // --- Auth Handlers are SIMPLIFIED ---
+  // --- Auth Handlers are now simplified - Auth is handled in LoginPage/SignupPage ---
   const handleLogin = () => {
-    setIsAuthenticated(true);
-    navigate('/app'); // Just navigate to /app. AppPage will show UploadView.
-    // setUploadDialogOpen(true); // <-- REMOVED
-    // setSelectedDocId(null); // <-- REMOVED
+    // Navigation is handled after successful Google OAuth in LoginPage
+    navigate('/app');
   };
 
   const handleSignup = () => {
-    setIsAuthenticated(true);
-    navigate('/app'); // Just navigate to /app.
-    // setUploadDialogOpen(true); // <-- REMOVED
-    // setSelectedDocId(null); // <-- REMOVED
+    // Navigation is handled after successful Google OAuth in SignupPage
+    navigate('/app');
   };
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
-    // setSelectedDocId(null); // <-- REMOVED
+    authLogout(); // Call the logout from AuthContext
     navigate('/login');
   };
 
@@ -101,11 +99,19 @@ export default function App() {
   // --- Render Routes ---
   const previewDocument = documents.find(doc => doc.id === previewDocId);
 
-  // Loading spinner logic (Unchanged)
+  // Loading spinner for auth check
+  if (isLoading) {
+    return (
+      <div className="w-screen h-screen flex items-center justify-center bg-white dark:bg-black">
+        <p className="dark:text-white">Loading...</p>
+      </div>
+    );
+  }
+
+  // Loading spinner for documents (only when authenticated)
   if (isLoadingDocs && isAuthenticated) {
     return (
       <div className="w-screen h-screen flex items-center justify-center bg-white dark:bg-black">
-        {/* Add a loading spinner component here */}
         <p className="dark:text-white">Loading Documents...</p>
       </div>
     );

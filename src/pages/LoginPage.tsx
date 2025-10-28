@@ -6,6 +6,9 @@ import { Sparkles, Scale } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from '../components/ui/badge';
 import { cn } from '../components/lib/utils';
+import { useGoogleLogin } from '@react-oauth/google';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -15,22 +18,48 @@ interface LoginPageProps {
 export function LoginPage({ onLogin, onSwitchToSignup }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const { login, setUserFromProfile } = useAuth();
+  const navigate = useNavigate();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email && password) {
-      onLogin();
+      // For traditional email/password login (to be implemented with backend)
+      console.log('Traditional login not yet implemented');
+      // onLogin();
     } else {
       console.error('Please enter your email and password.');
     }
   };
 
-  const handleGoogleLogin = () => {
-    // Backend/Auth logic would be triggered here
-    console.log('Google login clicked');
-    // For now, you could also call onLogin() if you want it to proceed
-    onLogin(); 
-  };
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (response: any) => {
+      // response.credential contains the ID token when configured for id_token flow
+      if (response?.credential) {
+        login(response.credential);
+        navigate('/app');
+        return;
+      }
+
+      // Some flows return an access_token instead. Fetch profile and set user.
+      if (response?.access_token) {
+        try {
+          const res = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${response.access_token}`);
+          if (!res.ok) throw new Error(`userinfo fetch failed: ${res.status}`);
+          const profile = await res.json();
+          setUserFromProfile(profile, response.access_token);
+          navigate('/app');
+          return;
+        } catch (err) {
+          console.error('Failed to fetch Google profile:', err);
+        }
+      }
+
+      console.error('No credential or access_token returned from Google login', response);
+    },
+    onError: () => {
+      console.error('Google login failed');
+    },
+  });
 
   return (
     <div
@@ -124,19 +153,21 @@ export function LoginPage({ onLogin, onSwitchToSignup }: LoginPageProps) {
           </div>
 
           {/* --- Google Sign-In Button --- */}
-          <Button
-            type="button"
-            onClick={handleGoogleLogin}
-            className="w-full bg-white dark:bg-transparent border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-center h-11 transition-all duration-300"
-          >
-            <svg className="w-4 h-4 mr-2" viewBox="0 0 48 48">
-              <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path>
-              <path fill="#FF3D00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path>
-              <path fill="#4CAF50" d="m24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.108-11.283-7.404l-6.571 4.819C9.656 39.663 16.318 44 24 44z"></path>
-              <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C39.756 34.631 44 27.925 44 20c0-1.341-.138-2.65-.389-3.917z"></path>
-            </svg>
-            Sign In with Google
-          </Button>
+          <div className="w-full flex items-center justify-center">
+            <Button
+              type="button"
+              onClick={() => googleLogin()}
+              className="w-full bg-white dark:bg-transparent border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-center h-11 transition-all duration-300"
+            >
+              <svg className="w-4 h-4 mr-2" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
+                <path fill="#FF3D00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z" />
+                <path fill="#4CAF50" d="m24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.108-11.283-7.404l-6.571 4.819C9.656 39.663 16.318 44 24 44z" />
+                <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C39.756 34.631 44 27.925 44 20c0-1.341-.138-2.65-.389-3.917z" />
+              </svg>
+              Sign In with Google
+            </Button>
+          </div>
 
           <div className="mt-6 text-center">
             <p className="text-gray-600 dark:text-gray-400 text-sm">

@@ -1,6 +1,7 @@
 // src/hooks/useDocuments.ts
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import type { Document, Message, DocumentType } from '../components/MainApp';
 import initialDocuments from '../components/lib/documents';
 
@@ -14,47 +15,44 @@ export function useDocuments(isAuthenticated: boolean) {
   const [documents, setDocuments] = useState<Document[]>([]);
   // We can keep this for the chat fetch
   const [isLoadingDocs, setIsLoadingDocs] = useState(true); 
+  const { authToken } = useAuth();
 
   // --- 2. LOAD DOCS AND MERGE CHATS ---
   useEffect(() => {
     if (isAuthenticated) {
       setIsLoadingDocs(true);
       
-      // --- Step A: Load your local documents first ---
-      // We add an empty chatHistory array to all of them
-      const localDocuments = initialDocuments.map(doc => ({
-        ...doc,
-        chatHistory: doc.chatHistory || [] 
-      }));
+      // --- Step A: Use bundled demo documents as the starting set ---
+      // Documents are expected to be persisted on the backend in production.
+      // For now we keep them in-memory and use the bundled `initialDocuments`.
+      const localDocuments = initialDocuments.map(doc => ({ ...doc, chatHistory: doc.chatHistory || [] }));
 
-      // --- Step B: Fetch ONLY the chat histories from your DB ---
-      const fetchChatHistories = async () => {
+      // --- Step B: Fetch documents from backend (if available). Server is source of truth.
+      const fetchServerDocs = async () => {
         try {
-          // This endpoint just returns an array of chat histories
-          const response = await fetch('/api/chats'); // <-- YOUR CHAT GET ENDPOINT
-          if (!response.ok) throw new Error('Failed to fetch chats');
-          
-          const chatData: ChatHistoryRecord[] = await response.json();
+          const { fetchDocumentsFromServer } = await import('./documentsApi');
+          const serverDocs: Document[] = await fetchDocumentsFromServer(authToken || undefined);
 
-          // --- Step C: Merge the saved chats into your local docs ---
-          const mergedDocuments = localDocuments.map(localDoc => {
-            const savedChat = chatData.find(chat => chat.docId === localDoc.id);
-            return savedChat
-              ? { ...localDoc, chatHistory: savedChat.chatHistory }
-              : localDoc;
-          });
+          // Ensure chatHistory exists on each doc and then merge any demo docs missing on server
+          const normalizedServer = serverDocs.map(d => ({ ...d, chatHistory: (d as any).chatHistory || [] }));
 
-          setDocuments(mergedDocuments);
+          const merged = [
+            ...normalizedServer,
+            ...initialDocuments
+              .filter(d => !normalizedServer.find(sd => sd.id === d.id))
+              .map(doc => ({ ...doc, chatHistory: doc.chatHistory || [] })),
+          ];
 
+          setDocuments(merged);
         } catch (error) {
-          console.error("Failed to fetch chat histories:", error);
-          // If it fails, we still have the local docs
+          console.error('Failed to fetch documents from server:', error);
+          // Fallback to bundled demo docs if server fetch fails
           setDocuments(localDocuments);
         }
         setIsLoadingDocs(false);
       };
 
-      fetchChatHistories();
+      fetchServerDocs();
 
     } else {
       setDocuments([]); // Clear docs on logout
@@ -82,7 +80,24 @@ export function useDocuments(isAuthenticated: boolean) {
       chatHistory: [], // Starts empty
     };
 
+    // Add the local doc immediately for a snappy UX
     setDocuments(prev => [newDoc, ...prev]);
+
+    // --- Background: attempt to upload to server and merge server response ---
+    (async () => {
+      try {
+  const { uploadDocumentToServer } = await import('./documentsApi');
+  const serverDoc = await uploadDocumentToServer(file, documentType, authToken || undefined);
+
+        // Merge server values (id, fileUrl, metadata) into the local doc
+        setDocuments(prev => prev.map(d => d.id === newDoc.id ? { ...d, ...serverDoc } : d));
+        console.log('Document uploaded to server and merged:', serverDoc);
+      } catch (err) {
+        // Keep local doc if upload fails; console log for now
+        console.warn('Background upload failed, keeping local doc:', err);
+      }
+    })();
+
     return newDoc; // Return it so App.tsx can select it
   };
 
@@ -150,25 +165,15 @@ export function useDocuments(isAuthenticated: boolean) {
 
     // --- API CALL: SAVE *JUST* THIS CHAT HISTORY ---
     try {
-      // This endpoint finds or creates a chat record for `documentId`
-      // and overwrites its `chatHistory` field.
-      await fetch(`/api/chats/${documentId}`, { // <-- YOUR CHAT SAVE/PATCH ENDPOINT
-        method: 'POST', // or 'PUT' or 'PATCH'
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chatHistory: newChatHistory }), // Send only the new history
-      });
+  // Use the documentsApi helper to save chat history (boilerplate moved there)
+  const { saveChatHistory } = await import('./documentsApi');
+  await saveChatHistory(documentId, newChatHistory, authToken || undefined);
       console.log(`Chat history saved for doc ${documentId}`);
 
     } catch (error) {
       console.error("Failed to save chat:", error);
-      // Rollback on failure
-      setDocuments(prevDocs =>
-        prevDocs.map(d =>
-          d.id === documentId
-            ? { ...d, chatHistory: currentChatHistory } // Revert
-            : d
-        )
-      );
+      // Don't rollback on failure to avoid disappearing messages. Keep optimistic UI and
+      // optionally show a UI indicator for unsynced messages in a follow-up.
     }
   };
 
