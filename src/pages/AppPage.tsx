@@ -1,8 +1,9 @@
-// src/components/AppPage.tsx
-
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cubicBezier } from 'framer-motion';
+import { useState } from 'react';
+import { Button } from '../components/ui/button';
+import { Menu } from 'lucide-react';
 
 // Import the components it manages
 import { MainApp, type Document, type DocumentType } from '../components/MainApp';
@@ -49,7 +50,11 @@ export function AppPage({
   handleSendMessage,
   onPreviewDocument,
 }: AppPageProps) {
-  
+
+  // --- STATE for Mobile Sidebar ---
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  // ---------------------------------
+
   // --- URL & Navigation ---
   // Get the documentId from the URL, e.g., "/app/doc-123"
   const { documentId } = useParams<{ documentId: string }>();
@@ -58,15 +63,16 @@ export function AppPage({
   // --- DERIVED STATE FROM URL ---
   // The "upload dialog" is open if NO documentId is in the URL.
   const isUploadViewOpen = documentId === undefined;
-  
+
   // Find the selected document based on the URL parameter.
-  const selectedDocument = documents.find(doc => doc.id === documentId);
+  // const selectedDocument = documents.find(doc => doc.id === documentId); // Not used here
 
   // --- NEW EVENT HANDLERS (that use navigation) ---
 
   // When a user selects a doc from the list (in UploadView or MainApp)
   const handleSelectDocument = (id: string) => {
     navigate(`/app/${id}`);
+    setIsMobileSidebarOpen(false); // Close mobile sidebar on selection
   };
 
   // When a user uploads a new doc
@@ -78,6 +84,7 @@ export function AppPage({
   // When a user deletes a doc
   const handleDeleteAndDeselect = (id: string) => {
     handleDeleteDocument(id); // Call hook fn from props
+    setIsMobileSidebarOpen(false); // Close mobile sidebar
     if (documentId === id) {
       // If the currently viewed doc was deleted, go back to the upload view
       navigate('/app');
@@ -87,6 +94,7 @@ export function AppPage({
   // When the user clicks the "Upload" button in the MainApp sidebar
   const handleOpenUploadView = () => {
     navigate('/app');
+    setIsMobileSidebarOpen(false); // Close mobile sidebar
   };
 
   // --- RENDER ---
@@ -101,18 +109,36 @@ export function AppPage({
         onToggleTheme={onToggleTheme}
       />
 
-      {/* 2. The main content area with the animation */}
-      <div className="min-h-screen w-full flex items-center justify-center 
-                       bg-gray-100 dark:bg-gradient-to-br dark:from-black dark:via-black dark:to-indigo-950">
+      {/* 2. MOBILE SIDEBAR TOGGLE BUTTON */}
+      {/* ⬅️ MODIFIED: top-2 instead of top-[60px] to move it higher */}
+      {!isUploadViewOpen && (
+        <div
+          className="fixed top-6 left-4 z-50 md:hidden"
+        >
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setIsMobileSidebarOpen(prev => !prev)}
+            className="bg-white/90 dark:bg-gray-800/80 backdrop-blur-md border-gray-300 dark:border-gray-700/50"
+            aria-label="Toggle document list"
+          >
+            <Menu className="w-5 h-5 text-black dark:text-white" />
+          </Button>
+        </div>
+      )}
+      {/* --------------------------------- */}
+
+      {/* 3. The main content area with the animation */}
+      <div className="min-h-screen w-full flex items-center justify-center
+                      bg-gray-100 dark:bg-gradient-to-br dark:from-black dark:via-black dark:to-indigo-950">
         <AnimatePresence mode="wait">
           {isUploadViewOpen ? (
-            // --- SHOW UPLOAD VIEW ---
-            // This is shown when the URL is just "/app"
+            // --- SHOW UPLOAD VIEW (/app) ---
             <motion.div
               key="upload-view"
-              className="w-[70vw] max-w-[70vw] h-[80vh] shadow-2xl"
+              // MODIFIED: Full screen on mobile, card on desktop
+              className="w-full h-screen md:w-[70vw] md:max-w-[1200px] md:h-[80vh] md:shadow-2xl rounded-none md:rounded-2xl"
               layoutId="app-container"
-              style={{ borderRadius: '1rem' }}
               transition={appTransition}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1.0 }}
@@ -122,16 +148,16 @@ export function AppPage({
                 documents={documents}
                 onUpload={handleUploadAndSelect} // Use new nav handler
                 onSelect={handleSelectDocument} // Use new nav handler
+                isMobile={window.innerWidth < 768} // Use window size for initial render flag
               />
             </motion.div>
           ) : (
-            // --- SHOW MAIN APP ---
-            // This is shown when the URL is "/app/some-doc-id"
+            // --- SHOW MAIN APP (/app/:id) ---
             <motion.div
               key="main-app"
-              className="w-full h-screen"
+              // MODIFIED: Always full screen (rounded-none) since the interior handles the layout/sizing
+              className="w-full h-screen rounded-none"
               layoutId="app-container"
-              style={{ borderRadius: '0rem' }}
               transition={appTransition}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -145,11 +171,15 @@ export function AppPage({
                 onPreviewDocument={onPreviewDocument}
                 onDownloadDocument={handleDownloadDocument}
                 onSendMessage={handleSendMessage}
-                
+
                 // Pass document data
                 documents={documents}
                 selectedDocId={documentId || null} // Pass the ID from the URL
-                
+
+                // ✅ ADDED: Pass mobile sidebar state
+                isMobileSidebarOpen={isMobileSidebarOpen}
+                setIsMobileSidebarOpen={setIsMobileSidebarOpen}
+
                 // Wire up new navigation handlers
                 onSelectDocument={handleSelectDocument}
                 onUploadDialogOpenChange={handleOpenUploadView}
