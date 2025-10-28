@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
@@ -22,6 +22,7 @@ import {
   Camera,
 } from 'lucide-react';
 import { cn } from '../components/lib/utils';
+import { useAuth } from '../contexts/AuthContext';
 
 interface ProfilePageProps {
   onBack: () => void;
@@ -43,14 +44,32 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
 
   // State for editable fields
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState('John Doe');
+  const [name, setName] = useState('');
   const [profession, setProfession] = useState('Legal Professional');
-  const [initials, setInitials] = useState('JD');
-  const [email, setEmail] = useState('john.doe@example.com');
-  const [role, setRole] = useState('Legal Analyst');
+  const [initials, setInitials] = useState('');
+  const [email, setEmail] = useState('');
+  const [role, setRole] = useState('');
 
   const [avatarImage, setAvatarImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user, updateProfile } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setEmail(user.email || '');
+      setInitials((user.name || '')
+        .split(' ')
+        .map(n => n[0])
+        .slice(0,2)
+        .join('')
+        .toUpperCase());
+      // keep profession and role as defaults unless backend provides them
+      setProfession((user as any).profession || 'Legal Professional');
+      setRole((user as any).role || 'Legal Analyst');
+      if (user.picture) setAvatarImage(user.picture);
+    }
+  }, [user]);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -170,19 +189,19 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
                     </div>
                   ) : (
                     <>
-                      <h2 className="text-black dark:text-white text-2xl font-bold mb-1">
-                        {name}
-                      </h2>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                        {profession}
-                      </p>
+                      <h2 className="text-black dark:text-white text-2xl font-bold mb-1">{name}</h2>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">{profession}</p>
                     </>
                   )}
 
                   <div className="w-full pt-4 border-t border-gray-200 dark:border-gray-700/50 mt-4">
                     {isEditing ? (
                       <Button
-                        onClick={() => setIsEditing(false)}
+                        onClick={() => {
+                          // Save changes to AuthContext
+                          updateProfile({ name, email, picture: avatarImage || '' });
+                          setIsEditing(false);
+                        }}
                         className="w-full bg-green-500 hover:bg-green-600 text-white"
                       >
                         <Check className="w-4 h-4 mr-2" />
@@ -192,9 +211,7 @@ export function ProfilePage({ onBack }: ProfilePageProps) {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
                           <Shield className="w-4 h-4" />
-                          <span className="text-sm font-medium">
-                            Premium Account
-                          </span>
+                          <span className="text-sm font-medium">Premium Account</span>
                         </div>
                         <Button
                           onClick={() => setIsEditing(true)}
