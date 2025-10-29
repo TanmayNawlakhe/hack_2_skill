@@ -77,9 +77,9 @@ export function DocumentExtrasSidebar({ document: doc }: DocumentExtrasSidebarPr
 
   return (
     // --- MODIFIED: w-full/h-auto for mobile ---
-    <div className="w-full md:w-[30%] h-auto md:h-[89vh] flex flex-col border-l border-gray-200 dark:border-gray-800/50 bg-white/50 dark:bg-transparent backdrop-blur-sm overflow-hidden">
+    <div className="w-full md:w-[30%] h-auto md:h-[89vh] pt-8 md:pt-0 flex flex-col md:border-l border-gray-200 dark:border-gray-800/50 bg-white/50 dark:bg-transparent backdrop-blur-sm overflow-hidden">
       <ScrollArea className="flex-1 min-h-0 [&_[data-orientation='vertical']]:hidden">
-        <div className="flex flex-col gap-6 px-4 pt-1 "> {/* Added padding here */}
+        <div className="flex flex-col gap-6 py-4 md:pl-4 pt-1 "> {/* Added padding here */}
           <motion.div
             variants={itemVariants}
             initial="hidden"
@@ -165,7 +165,7 @@ export function DocumentExtrasSidebar({ document: doc }: DocumentExtrasSidebarPr
           </motion.div>
 
           {/* Relevant Contacts Section */}
-          <motion.div
+          {/* <motion.div
             variants={itemVariants}
             initial="hidden"
             animate="visible"
@@ -186,7 +186,7 @@ export function DocumentExtrasSidebar({ document: doc }: DocumentExtrasSidebarPr
                 </motion.div>
               ))}
             </motion.div>
-          </motion.div>
+          </motion.div> */}
         </div>
       </ScrollArea>
     </div>

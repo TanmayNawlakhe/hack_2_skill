@@ -41,7 +41,7 @@ export function UserNav({
 
   return (
     // 4. Make the root a flex container
-    <div className="fixed top-4 right-4 z-[60] flex pr-8 items-center gap-2" data-user-nav-root>
+    <div className="fixed top-5 right-1 z-[60] flex pr-8 items-center gap-2" data-user-nav-root>
 
       {/* 5. --- NEW THEME TOGGLE BUTTON --- */}
       <Button
@@ -88,7 +88,7 @@ export function UserNav({
                 )}
               </div>
               <div className="flex flex-col">
-                <p className="text-sm font-medium leading-none">{displayName}</p>
+                <p className="text-sm font-medium leading-none pb-1">{displayName}</p>
                 <p className="text-xs leading-none text-gray-500 dark:text-gray-400">{displayEmail}</p>
               </div>
             </div>

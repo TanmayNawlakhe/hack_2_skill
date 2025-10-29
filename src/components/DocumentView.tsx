@@ -89,7 +89,7 @@ export function DocumentView({ document, onSendMessage, onToggleMobileSidebar }:
                   <ChevronDown className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-[calc(100vw-4rem)] bg-white/80 dark:bg-transparent backdrop-blur-3xl border-gray-300 dark:border-gray-700 text-black dark:text-white">
+              <DropdownMenuContent className="w-fit absolute -left-14  bg-white/80 dark:bg-transparent backdrop-blur-3xl border-gray-300 dark:border-gray-700 text-black dark:text-white">
                 <DropdownMenuItem onSelect={() => setActiveTab('overview')} className="focus:bg-gray-200 dark:focus:bg-gray-700 cursor-pointer">
                   <TrendingUp className="w-4 h-4 mr-2" /> Overview
                 </DropdownMenuItem>
@@ -135,7 +135,7 @@ export function DocumentView({ document, onSendMessage, onToggleMobileSidebar }:
         </div>
 
         <AnimatePresence mode="wait">
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-hidden">
             <TabsContent value="overview" className="m-0 px-6" asChild>
               <motion.div
                 key="overview"
@@ -152,7 +152,7 @@ export function DocumentView({ document, onSendMessage, onToggleMobileSidebar }:
                     variants={containerVariants} 
                     initial="hidden" 
                     animate="visible" 
-                    className="pr-4 pt-1"
+                    className="md:pr-3 pt-1"
                   >
                     <motion.p variants={itemVariants} className="text-gray-600 dark:text-gray-400 mb-3">
                       Uploaded on {document.uploadDate}
@@ -170,7 +170,7 @@ export function DocumentView({ document, onSendMessage, onToggleMobileSidebar }:
                         variants={itemVariants}
                         className="bg-white dark:bg-[#1a1f3a]/50 border border-gray-200 dark:border-gray-800/50 rounded-xl p-4"
                       >
-                        <div className="text-gray-600 dark:text-gray-400 text-sm mb-2">Complexity</div>
+                        <div className="text-gray-600 dark:text-gray-400 text-sm mb-2">Risks</div>
                         <div className="text-black dark:text-white text-2xl">{document.evals.complexity}</div>
                       </motion.div>
                       <motion.div
@@ -254,7 +254,7 @@ export function DocumentView({ document, onSendMessage, onToggleMobileSidebar }:
                 className="flex flex-col md:flex-row w-full h-auto"
               >
                 {/* --- MODIFIED: Replaced ScrollArea with a simple div --- */}
-                <div className="flex-1 h-auto md:h-[87vh] w-full pt-2">
+                <div className="flex-1 h-auto md:h-[87vh] w-full pt-2 md:pr-5">
                   <motion.div className="max-w-full" variants={containerVariants} initial="hidden" animate="visible">
                     <motion.h2 variants={itemVariants} className="text-black dark:text-white text-2xl mb-6">
                       Risk Analysis
@@ -315,7 +315,7 @@ export function DocumentView({ document, onSendMessage, onToggleMobileSidebar }:
                 className="flex flex-col md:flex-row w-full h-auto"
               >
                 {/* --- MODIFIED: Replaced ScrollArea with a simple div --- */}
-                <div className="flex-1 h-auto md:h-[87vh] w-full pt-2">
+                <div className="flex-1 h-auto md:h-[87vh] w-full pt-2 md:pr-5">
                   <motion.div className="max-w-full" variants={containerVariants} initial="hidden" animate="visible">
                     <motion.h2 variants={itemVariants} className="text-black dark:text-white text-2xl mb-6">
                       Document Clauses

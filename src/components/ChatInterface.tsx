@@ -74,7 +74,6 @@ export function ChatInterface({
   const [isLoading, setIsLoading] = useState(false);
   const [expandedSourcesId, setExpandedSourcesId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [selectedModel, setSelectedModel] = useState<string>('gemini-2.5-pro');
   const suggestions = [
@@ -92,7 +91,6 @@ export function ChatInterface({
 
   const handleSendMessage = async (messageText?: string) => {
     setIsListening(false);
-    setSpeakingMessageId(null);
     const textToSend = messageText || input;
     if (!textToSend.trim()) return;
     setInput('');
@@ -108,16 +106,6 @@ export function ChatInterface({
 
   const handleToggleSources = (messageId: string) => {
     setExpandedSourcesId(prevId => (prevId === messageId ? null : messageId));
-  };
-
-  const handleToggleSpeech = (messageId: string, text: string) => {
-    if (speakingMessageId === messageId) {
-      setSpeakingMessageId(null);
-      console.log("TODO: Implement stop speech logic");
-    } else {
-      setSpeakingMessageId(messageId);
-      console.log(`TODO: Implement speech logic for: ${text}`);
-    }
   };
 
   const handleMicClick = () => {
@@ -210,7 +198,7 @@ export function ChatInterface({
                     </div>
                   )}
                 </div>
-                {message.role === 'assistant' && (
+                {/* {message.role === 'assistant' && (
                   <button
                     onClick={() => handleToggleSpeech(message.id, message.content)}
                     className="flex-shrink-0 p-2 mt-1 rounded-full text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#2a304f]/50 transition-all"
@@ -222,7 +210,7 @@ export function ChatInterface({
                       <Volume2 className="w-5 h-5" />
                     )}
                   </button>
-                )}
+                )} */}
                 {message.role === 'user' && (
                   <div className="w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
                     <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />

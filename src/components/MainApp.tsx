@@ -109,7 +109,7 @@ export function MainApp({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setIsMobileSidebarOpen(false)}
-                className="fixed inset-0 bg-black/50 z-20 md:hidden"
+                className="fixed inset-0 bg-black/50 z-20 sm:hidden"
                 aria-label="Close sidebar"
               />
               {/* Mobile Sidebar Content */}
@@ -118,7 +118,7 @@ export function MainApp({
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className="fixed top-0 left-0 h-full z-30 md:hidden"
+                className="fixed top-0 left-0 h-full z-30 sm:hidden"
               >
                 <DocumentSidebar
                   documents={documents}
@@ -134,7 +134,7 @@ export function MainApp({
         </AnimatePresence>
 
         {/* --- ADDED: Desktop Sidebar (Static) --- */}
-        <div className="hidden md:block flex-shrink-0"> {/* Wrapper to hide on mobile and prevent shrinking */}
+        <div className="hidden lg:block flex-shrink-0"> {/* Wrapper to hide on mobile and prevent shrinking */}
           <DocumentSidebar
             documents={documents}
             selectedDocId={selectedDocId}
